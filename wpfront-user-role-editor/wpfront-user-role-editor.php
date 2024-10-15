@@ -4,10 +4,10 @@
  * Plugin Name: WPFront User Role Editor
  * Plugin URI: http://wpfront.com/user-role-editor-pro/ 
  * Description: Allows you to manage your site's security using user role permissions.
- * Version: 4.1.1
+ * Version: 4.2.1
  * Requires at least: 5.1
  * Requires PHP: 7.0
- * Author: Syam Mohan
+ * Author: WPFront Team
  * Author URI: http://wpfront.com
  * License: GPL v3 
  * Text Domain: wpfront-user-role-editor
@@ -46,7 +46,7 @@ if (!class_exists('\WPFront\URE\WPFront_User_Role_Editor')) {
 
     class WPFront_User_Role_Editor {
 
-        const VERSION = '4.1.1.05093';
+        const VERSION = '4.2.1.10141';
         const PLUGIN_SLUG = 'wpfront-user-role-editor';
 
         protected static $instance = null;

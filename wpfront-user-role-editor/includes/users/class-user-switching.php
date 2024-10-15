@@ -431,7 +431,9 @@ if (!class_exists('\WPFront\URE\User_Switching\WPFront_User_Role_Editor_User_Swi
             $c_name = $this->get_switched_users_stack_cookie_name();
 
             if (empty($users)) {
-                setcookie($c_name, '', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+                if(isset($_COOKIE[$c_name])) {
+                    setcookie($c_name, '', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+                }
 
                 wp_cache_delete($c_name);
 
@@ -523,15 +525,15 @@ if (!class_exists('\WPFront\URE\User_Switching\WPFront_User_Role_Editor_User_Swi
 
             $wc = WC();
 
-            if (!property_exists($wc, 'session')) {
+            if (empty($wc->session)) {
                 return;
             }
 
-            if (!method_exists($wc->session, 'forget_session')) {
+            if (!$wc->session instanceof object || !method_exists($wc->session, 'forget_session')) {// @phpstan-ignore-line
                 return;
             }
 
-            $wc->session->forget_session();
+            $wc->session->forget_session();// @phpstan-ignore-line
         }
 
         /**

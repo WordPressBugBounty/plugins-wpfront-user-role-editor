@@ -105,10 +105,10 @@ if (!class_exists('WPFront\URE\Post_Type\WPFront_User_Role_Editor_Post_Type_Enti
             $charset_collate = $wpdb->get_charset_collate();
 
             $sql = "CREATE TABLE $table_name (\n"
-                    . "id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,\n"
+                    . "id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n"
                     . "name varchar(150) DEFAULT NULL,\n"
                     . "label varchar(250) DEFAULT NULL,\n"
-                    . "status int NOT NULL DEFAULT 1,\n"
+                    . "status int(11) NOT NULL DEFAULT 1,\n"
                     . "post_type_arg text DEFAULT NULL,\n"
                     . "taxonomies varchar(1000) NOT NULL DEFAULT '',\n"
                     . "capability_type varchar(1000) DEFAULT NULL,\n"

@@ -100,14 +100,26 @@ if (!class_exists('\WPFront\URE\Nav_Menu\WPFront_User_Role_Editor_Nav_Menu_Permi
             
             add_action('admin_print_scripts-nav-menus.php', array($this, 'enqueue_menu_scripts'));
             add_action('admin_print_styles-nav-menus.php', array($this, 'enqueue_menu_styles'));
-            add_action('load-nav-menus.php', array($this, 'menu_walker_override_notice_action'));
+        }
+
+        /**
+         * Whether walker override needed
+         *
+         * @return bool
+         */
+        public function need_menu_walker_override() {
+            global $wp_version;
+            return version_compare($wp_version, '5.4', '<');
         }
         
         /**
          * Hooks into init and sets the filter for overriding menu walker.
          */
         public function wp_init() {
-            add_filter('wp_edit_nav_menu_walker', array($this, 'override_edit_nav_menu_walker'), PHP_INT_MAX);
+            if($this->need_menu_walker_override()) {
+                add_filter('wp_edit_nav_menu_walker', array($this, 'override_edit_nav_menu_walker'), PHP_INT_MAX);
+                add_action('load-nav-menus.php', array($this, 'menu_walker_override_notice_action'));
+            }
         }
         
         /**
@@ -365,11 +377,13 @@ if (!class_exists('\WPFront\URE\Nav_Menu\WPFront_User_Role_Editor_Nav_Menu_Permi
             add_action('wpfront_ure_options_ui_field_disable_navigation_menu_permissions_update', array($this, 'options_ui_update'), 10, 1);
             add_action('wpfront_ure_options_ui_field_disable_navigation_menu_permissions_help', array($this, 'options_ui_help'), 10, 2);
             
-            $option_keys['override_navigation_menu_permissions'] = '';
-            add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions_label', array($this, 'options_ui_label'), 10, 1);
-            add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions', array($this, 'options_ui_field'), 10, 1);
-            add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions_update', array($this, 'options_ui_update'), 10, 1);
-            add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions_help', array($this, 'options_ui_help'), 10, 2);
+            if($this->need_menu_walker_override()) {
+                $option_keys['override_navigation_menu_permissions'] = '';
+                add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions_label', array($this, 'options_ui_label'), 10, 1);
+                add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions', array($this, 'options_ui_field'), 10, 1);
+                add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions_update', array($this, 'options_ui_update'), 10, 1);
+                add_action('wpfront_ure_options_ui_field_override_navigation_menu_permissions_help', array($this, 'options_ui_help'), 10, 2);
+            }
             
             return $option_keys;
         }

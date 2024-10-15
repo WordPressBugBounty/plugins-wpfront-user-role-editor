@@ -45,8 +45,6 @@ if (!class_exists('WPFront\URE\Options\WPFront_User_Role_Editor_Options_Entity')
      */
     class WPFront_User_Role_Editor_Options_Entity extends \WPFront\URE\WPFront_User_Role_Editor_Entity_Base {
 
-        private static $cache = null;
-
         protected function table_name_suffix() {
             return 'options';
         }
@@ -58,10 +56,10 @@ if (!class_exists('WPFront\URE\Options\WPFront_User_Role_Editor_Options_Entity')
             $charset_collate = $wpdb->get_charset_collate();
 
             $sql = "CREATE TABLE $table_name (\n"
-                    . "id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,\n"
+                    . "id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n"
                     . "option_name varchar(250) DEFAULT NULL,\n"
                     . "option_value longtext DEFAULT NULL,\n"
-                    . "auto_load tinyint DEFAULT 1,\n"
+                    . "auto_load tinyint(1) DEFAULT 1,\n"
                     . "PRIMARY KEY  (id),\n"
                     . "KEY option_name (option_name),\n"
                     . "KEY auto_load (auto_load)\n"
@@ -71,25 +69,22 @@ if (!class_exists('WPFront\URE\Options\WPFront_User_Role_Editor_Options_Entity')
         }
 
         private function load_options() {
-            if (self::$cache !== null) {
+            $found = false;
+            $this->cache_get('load_options_processed', $found);
+            if($found) {
                 return;
             }
 
-            self::$cache = array();
+            global $wpdb;
+            $table_name = $this->table_name();
+            $sql = "SELECT option_name, option_value FROM $table_name WHERE auto_load=1";
+            $results = $wpdb->get_results($sql);
 
-            $found = false;
-            $this->cache_get('role_capabilities_processed', $found);
-            if (!$found) {
-                global $wpdb;
-                $table_name = $this->table_name();
-
-                $sql = "SELECT option_name, option_value FROM $table_name WHERE auto_load=1";
-                $results = $wpdb->get_results($sql);
-
-                foreach ($results as $value) {
-                    self::$cache[$value->option_name] = maybe_unserialize($value->option_value);
-                }
+            foreach ($results as $value) {
+                $this->cache_set($value->option_name, maybe_unserialize($value->option_value));
             }
+
+            $this->cache_set('load_options_processed', true);
         }
 
         /**
@@ -114,23 +109,18 @@ if (!class_exists('WPFront\URE\Options\WPFront_User_Role_Editor_Options_Entity')
                 return false;
             }
 
-            if (isset(self::$cache[$option_name])) {
-                $value = self::$cache[$option_name];
-                $exists = true;
+            global $wpdb;
+            $table_name = $this->table_name();
+
+            $sql = $wpdb->prepare("SELECT option_value FROM $table_name WHERE option_name = %s", $option_name);
+            $value = $wpdb->get_row($sql);
+
+            if (empty($value)) {
+                $exists = false;
+                $value = false;
             } else {
-                global $wpdb;
-                $table_name = $this->table_name();
-
-                $sql = $wpdb->prepare("SELECT option_value FROM $table_name WHERE option_name = %s", $option_name);
-                $value = $wpdb->get_row($sql);
-
-                if (empty($value)) {
-                    $exists = false;
-                    $value = false;
-                } else {
-                    $value = maybe_unserialize($value->option_value);
-                    $exists = true;
-                }
+                $value = maybe_unserialize($value->option_value);
+                $exists = true;
             }
 
             $this->cache_set($option_name, $value);
@@ -205,7 +195,6 @@ if (!class_exists('WPFront\URE\Options\WPFront_User_Role_Editor_Options_Entity')
             $table_name = $this->table_name();
 
             $this->cache_delete($option_name);
-            unset(self::$cache[$option_name]);
 
             $wpdb->delete(
                     $table_name,

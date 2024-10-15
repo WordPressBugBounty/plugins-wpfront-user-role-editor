@@ -254,8 +254,9 @@ if (!class_exists('\WPFront\URE\WP\WPFront_User_Role_Editor_Login_Page_Url')) {
                 return $login_url;
             }
 
-            if (!empty(intval($post_data))) {
-                $post = get_post($post_data);
+            $post_id = intval($post_data);
+            if ($post_id !== 0) {
+                $post = get_post($post_id);
                 if (empty($post->ID) || $post->post_status != 'publish') {
                     return $login_url;
                 }

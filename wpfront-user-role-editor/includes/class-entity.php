@@ -75,13 +75,9 @@ if (!class_exists('\WPFront\URE\WPFront_User_Role_Editor_Entity_Base')) {
             }
             
             $table_version_key = $this->db_version_key();
-            
             $db_version = $this->get_db_version($table_version_key);
-            if (empty($db_version)) {
-                $db_version = '0.0';
-            }
             
-            if (version_compare($db_version, \WPFront\URE\WPFront_User_Role_Editor::VERSION, '>=')) {
+            if (!empty($db_version) && version_compare($db_version, \WPFront\URE\WPFront_User_Role_Editor::VERSION, '>=')) {
                 return true;
             }
             
@@ -89,9 +85,9 @@ if (!class_exists('\WPFront\URE\WPFront_User_Role_Editor_Entity_Base')) {
             
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
             $sql = $this->table_create_sql();
-            
-            dbDelta($sql);
-            
+
+            $deltaResult = dbDelta($sql);
+
             global $wpdb;
             $table_name = $this->table_name();
             
@@ -112,6 +108,10 @@ if (!class_exists('\WPFront\URE\WPFront_User_Role_Editor_Entity_Base')) {
             
             $this->drop_index_id();
             $this->custom_upgrade_script();
+
+            if(is_array($deltaResult) && count($deltaResult) !== 0) {
+                return false;
+            }
             
             $this->set_db_version($table_version_key, \WPFront\URE\WPFront_User_Role_Editor::VERSION);
             

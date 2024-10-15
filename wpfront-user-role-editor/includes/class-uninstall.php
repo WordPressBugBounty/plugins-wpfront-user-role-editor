@@ -96,6 +96,11 @@ if (!class_exists('\WPFront\URE\WPFront_User_Role_Editor_Uninstall')) {
             $options->uninstall();
         }
         
+        /**
+         * Returns DB settings value
+         *
+         * @return boolean
+         */
         private static function remove_data() {
             $obj = new WPFront_User_Role_Editor_Uninstall();
             return $obj->get_option('remove_data_on_uninstall');
@@ -149,6 +154,13 @@ if (!class_exists('\WPFront\URE\WPFront_User_Role_Editor_Uninstall')) {
             return '<strong>' . __('Remove Data on Uninstall', 'wpfront-user-role-editor') . '</strong>: ' . __('If enabled, removes all data related to this plugin from database(except roles data) including license information if any, while deleting the plugin. This will not deactivate the license automatically.', 'wpfront-user-role-editor');
         }
         
+        /**
+         * Returns option value
+         *
+         * @SuppressWarnings(PHPMD)
+         * @param string $key
+         * @return boolean
+         */
         protected function get_option($key) {
             return \WPFront\URE\Options\WPFront_User_Role_Editor_Options::instance()->get_network_option_boolean($key, '');
         }

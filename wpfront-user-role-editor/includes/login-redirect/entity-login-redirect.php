@@ -110,12 +110,12 @@ if (!class_exists('WPFront\URE\Login_Redirect\WPFront_User_Role_Editor_Login_Red
             $charset_collate = $wpdb->get_charset_collate();
             
             $sql = "CREATE TABLE $table_name (\n"
-                . "id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,\n"
+                . "id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n"
                 . "role varchar(250) DEFAULT NULL,\n"
-                . "priority int DEFAULT NULL,\n"
+                . "priority int(11) DEFAULT NULL,\n"
                 . "url varchar(2000) DEFAULT NULL,\n"
-                . "deny_wpadmin bit DEFAULT NULL,\n"
-                . "disable_toolbar bit DEFAULT NULL,\n"
+                . "deny_wpadmin bit(1) DEFAULT NULL,\n"
+                . "disable_toolbar bit(1) DEFAULT NULL,\n"
                 . "logout_url varchar(2000) DEFAULT '',\n"
                 . "PRIMARY KEY  (id),\n"
                 . "KEY priority (priority),\n"
