@@ -3,9 +3,9 @@ Contributors: syammohanm
 Donate link: https://wpfront.com/donate/
 Tags: role editor, user permissions, user access, security, capability manager
 Requires at least: 5.1
-Tested up to: 6.6.2
+Tested up to: 6.7
 Requires PHP: 7.0
-Stable tag: 4.2.1
+Stable tag: 4.2.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,9 @@ This plugin doesn't collect any personal information. For more information pleas
 19. Widget permissions
 
 == Changelog ==
+
+= 4.2.2 =
+* Security issue fix.
 
 = 4.2.1 =
 * Set 'Administrator' role permissions in navigation menu permissions.
@@ -308,6 +311,9 @@ This plugin doesn't collect any personal information. For more information pleas
 * Initial release.
 
 == Upgrade Notice ==
+
+= 4.2.2 =
+* Security issue fix.
 
 = 4.2.1 =
 * Compatibility fixes.

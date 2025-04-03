@@ -100,6 +100,7 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_User_Pro
             
             //general settings - new user default secondary roles
             add_action('load-options-general.php', array($this, 'load_options_general'));
+            
             global $wp_version;
             if(version_compare($wp_version, '5.5', '>=')) {
                 add_filter('allowed_options', array($this, 'whitelist_options'));
@@ -396,6 +397,19 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_User_Pro
             $objView->add_general_settings_script();
         }
         
+        /**
+         * This method is triggered during the update action of the general settings page
+         * and allows for updating secondary roles,
+         * and handling multisite default role updates.
+         *
+         * @param array<string,string[]> $whitelist_options The existing whitelist options.
+         * @return array<string,string[]> The modified whitelist options.
+         *
+         * @global string $action The current action being performed.
+         * @global string $option_page The current option page being processed.
+         *
+         * @throws \WPDieException If the nonce verification fails.
+         */
         public function whitelist_options($whitelist_options) {
             if(!current_user_can('manage_options')) {
                 return $whitelist_options;
@@ -408,8 +422,13 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_User_Pro
             }
             
             if($action == 'update' && $option_page == 'general') {
+                // Verify nonce
+                if (empty($_POST['wpfront_secondary_roles_nonce']) || !wp_verify_nonce($_POST['wpfront_secondary_roles_nonce'], 'wpfront_secondary_roles_action')) {
+                    wp_die(__('Security check failed.', 'wpfront-user-role-editor'));
+                }
+                
                 $roles = array();
-                if(!empty($_POST['wpfront-secondary-roles']) && is_array($_POST['wpfront-secondary-roles'])) {
+                if (!empty($_POST['wpfront-secondary-roles']) && is_array($_POST['wpfront-secondary-roles'])) {
                     $roles = array_keys($_POST['wpfront-secondary-roles']);
                 }
                 

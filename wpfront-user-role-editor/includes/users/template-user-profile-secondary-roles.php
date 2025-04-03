@@ -105,6 +105,8 @@ if(!class_exists('WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_User_Profi
                         </div>
                         <?php
                     }
+
+                    wp_nonce_field('wpfront_secondary_roles_action', 'wpfront_secondary_roles_nonce');
                 }
                 ?>
             </div>
