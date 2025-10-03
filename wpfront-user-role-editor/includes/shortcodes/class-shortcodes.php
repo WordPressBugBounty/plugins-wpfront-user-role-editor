@@ -95,7 +95,7 @@ if (!class_exists('\WPFront\URE\Shortcodes\WPFront_User_Role_Editor_Shortcodes')
                 $roles_text = implode(', ', $names);
             }
             
-            return $label . $roles_text;
+            return esc_html($label) . esc_html($roles_text);
         }
         
     }

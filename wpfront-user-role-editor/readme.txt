@@ -3,9 +3,9 @@ Contributors: syammohanm
 Donate link: https://wpfront.com/donate/
 Tags: role editor, user permissions, user access, security, capability manager
 Requires at least: 5.1
-Tested up to: 6.8.1
+Tested up to: 6.8.3
 Requires PHP: 7.0
-Stable tag: 4.2.3
+Stable tag: 4.2.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,10 @@ This plugin doesn't collect any personal information. For more information pleas
 19. Widget permissions
 
 == Changelog ==
+
+= 4.2.4 =
+* Security issue fix.
+* WP 6.9 compatibility fix.
 
 = 4.2.3 =
 * WP compatibility fix.
@@ -314,6 +318,9 @@ This plugin doesn't collect any personal information. For more information pleas
 * Initial release.
 
 == Upgrade Notice ==
+
+= 4.2.4 =
+* Security issue fix.
 
 = 4.2.3 =
 * WP compatibility fix.
