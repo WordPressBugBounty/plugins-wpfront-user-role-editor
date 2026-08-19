@@ -3,9 +3,9 @@ Contributors: syammohanm
 Donate link: https://wpfront.com/donate/
 Tags: role editor, user permissions, user access, security, capability manager
 Requires at least: 5.1
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.0
-Stable tag: 4.2.4
+Stable tag: 4.2.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -89,6 +89,10 @@ This plugin doesn't collect any personal information. For more information pleas
 19. Widget permissions
 
 == Changelog ==
+
+= 4.2.5 =
+* WP 7.1 compatibility fixes.
+* Assign/Migrate users functionality also requires edit_users capability.
 
 = 4.2.4 =
 * Security issue fix.
@@ -318,6 +322,9 @@ This plugin doesn't collect any personal information. For more information pleas
 * Initial release.
 
 == Upgrade Notice ==
+
+= 4.2.5 =
+* WP 7.1 compatibility fixes.
 
 = 4.2.4 =
 * Security issue fix.

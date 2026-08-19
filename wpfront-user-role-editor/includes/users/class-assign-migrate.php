@@ -110,7 +110,7 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_Assign_M
          * Adds ajax functions on admin_init
          */
         public function admin_init() {
-            if(current_user_can($this->get_cap())) {
+            if($this->can_promote_user()) {
                 add_action('wp_ajax_wpfront_user_role_editor_assign_roles_user_autocomplete', array($this, 'assign_roles_user_autocomplete_callback'), 10, 0);
             }
         }
@@ -123,6 +123,10 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_Assign_M
         }
 
         public function admin_menu() {
+            if(!$this->can_promote_user()) {
+                return;
+            }
+
             $page_hook_suffix = add_users_page($this->menu_title, $this->menu_link, $this->get_cap(), $this->get_menu_slug(), array($this, 'view'));
 
             $this->add_menu_hooks($page_hook_suffix);
@@ -136,7 +140,7 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_Assign_M
          * @return string[]
          */
         public function user_row_actions($actions, $user) {
-            if (current_user_can(self::CAP) && $user->ID !== wp_get_current_user()->ID && current_user_can('promote_user', $user->ID)) {
+            if ($user->ID !== wp_get_current_user()->ID && $this->can_promote_user($user->ID)) {
                 $actions['assign_roles'] = sprintf('<a href="%s">%s</a>', $this->get_self_url($user->ID), __('Assign Roles', 'wpfront-user-role-editor'));
             }
 
@@ -306,7 +310,7 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_Assign_M
          * @return boolean
          */
         public function filter_promote_user($user) {
-            return current_user_can('promote_user', $user->ID);
+            return $this->can_promote_user($user->ID);
         }
 
         /**
@@ -480,7 +484,7 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_Assign_M
          * @return void
          */
         public function assign_roles_user_autocomplete_callback() {
-            if(!current_user_can($this->get_cap())) {
+            if(!$this->can_promote_user()) {
                 wp_send_json_error();
             }
 
@@ -512,6 +516,44 @@ if (!class_exists('\WPFront\URE\Assign_Migrate\WPFront_User_Role_Editor_Assign_M
             }
 
             wp_send_json($user_details);
+        }
+
+        /**
+         * Checks if the current user can promote a user.
+         *
+         * @param int $user_id The ID of the user to check.
+         * @return bool True if the current user can promote the specified user, false otherwise.
+         */
+        protected function can_promote_user($user_id = 0) {
+            if(!current_user_can($this->get_cap())) {
+                return false;
+            }
+
+            if(!current_user_can('list_users')) {
+                return false;
+            }
+
+            if(!current_user_can('edit_users')) {
+                return false;
+            }
+
+            if(!current_user_can('list_roles')) {
+                return false;
+            }
+
+            if(empty($user_id)) {
+                return true;
+            }
+
+            if(!current_user_can('promote_user', $user_id)) {
+                return false;
+            }
+
+            if(!current_user_can('edit_user', $user_id)) {
+                return false;
+            }
+
+            return true;
         }
 
     }
