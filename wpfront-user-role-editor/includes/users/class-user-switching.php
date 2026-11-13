@@ -49,6 +49,13 @@ if (!class_exists('\WPFront\URE\User_Switching\WPFront_User_Role_Editor_User_Swi
 
         const CAP = 'switch_users';
 
+        /**
+         * Switched users stack for the current request.
+         *
+         * @var array<int|string>|null
+         */
+        private $switched_users_stack = null;
+
         protected function setUp() {
             $this->_setUp(self::CAP);
         }
@@ -359,48 +366,34 @@ if (!class_exists('\WPFront\URE\User_Switching\WPFront_User_Role_Editor_User_Swi
         }
 
         protected function get_switched_users_stack() {
+            if ($this->switched_users_stack !== null) {
+                return $this->switched_users_stack;
+            }
+
+            $this->switched_users_stack = array();
+
             if (!is_user_logged_in()) {
-                return array();
+                return $this->switched_users_stack;
             }
 
             $c_name = $this->get_switched_users_stack_cookie_name();
 
             if (isset($_COOKIE[$c_name])) {
-                $found = false;
-                $users = wp_cache_get($c_name, '', false, $found);
-                if ($found) {
-                    return $users;
+                $users = Utils::decrypt($_COOKIE[$c_name]);
+
+                if (!empty($users)) {
+                    $users = explode('-', $users);
+
+                    if (COOKIEHASH === $users[0]) {
+                        $time = $users[1];
+                        if ((time() - $time) <= 43200) {  //12 hours
+                            $this->switched_users_stack = explode(',', $users[2]);
+                        }
+                    }
                 }
-
-                $users = $_COOKIE[$c_name];
-
-                $users = Utils::decrypt($users);
-
-                if (empty($users)) {
-                    return array();
-                }
-
-                $users = explode('-', $users);
-
-                if (COOKIEHASH !== $users[0]) {
-                    return array();
-                }
-
-                $time = $users[1];
-                if ((time() - $time) > 43200) {  //12 hours
-                    return array();
-                }
-
-                $users = $users[2];
-
-                $users = explode(',', $users);
-
-                wp_cache_set($c_name, $users);
-
-                return $users;
             }
 
-            return array();
+            return $this->switched_users_stack;
         }
 
         protected function pop_switched_users_stack() {
@@ -435,12 +428,8 @@ if (!class_exists('\WPFront\URE\User_Switching\WPFront_User_Role_Editor_User_Swi
                     setcookie($c_name, '', time() - YEAR_IN_SECONDS, SITECOOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
                 }
 
-                wp_cache_delete($c_name);
-
                 unset($_COOKIE[$c_name]);
             } else {
-                wp_cache_set($c_name, $users);
-
                 if (!isset($_COOKIE[$c_name])) {
                     $remember = $this->current_user_is_remembered();
                 } else {
@@ -448,13 +437,15 @@ if (!class_exists('\WPFront\URE\User_Switching\WPFront_User_Role_Editor_User_Swi
                 }
 
                 $remember = $remember ? 'remember' : '';
-                $users = implode(',', $users);
-                $users = COOKIEHASH . '-' . time() . '-' . $users . '-' . $remember;
+                $values = implode(',', $users);
+                $values = COOKIEHASH . '-' . time() . '-' . $values . '-' . $remember;
 
-                $users = Utils::encrypt($users);
+                $values = Utils::encrypt($values);
 
-                setcookie($c_name, $users, 0, SITECOOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+                setcookie($c_name, $values, 0, SITECOOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
             }
+
+            $this->switched_users_stack = $users;
         }
 
         protected function get_last_session_user_id() {
